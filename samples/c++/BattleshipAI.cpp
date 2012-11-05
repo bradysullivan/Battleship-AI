@@ -9,7 +9,9 @@
 
 BattleshipAI::BattleshipAI()
 {
-	state = Config;
+	game_board = NULL;
+
+	state = Idle;
 
 	nick = "";
 	channel = "";
@@ -59,26 +61,58 @@ string BattleshipAI::handler(string raw_in)
 				state = Prep;
 				output = "PRIVMSG:" + channel + ":Ready to test!\n";
 			}
-
 			break;
 
 		case Idle:
-
 			if(input == "[start]")
 			{
-				state = Prep;
+				state = Config;
 				output = "PRIVMSG:" + channel + ":!bs-test\n";
 			}
 			break;
 
 		case Prep:
-			output = "PRIVMSG:" + channel + ":My nick: " + nick + "\n";
-			output += "PRIVMSG:" + channel + ":Referee: " + referee + "\n";
-			output += "PRIVMSG:" + channel + ":This channel: " + channel + "\n";
+			game_board = new GameBoard(10,10);
+
+			output = "PRIVMSG:" + referee + ":Pieces, " + placePieces(10, 10) + "\n";
 			break;
 	}
 
 	return output;
+}
+
+// To do: Fix the return values of either this function or setPiece().
+string BatleshipAI::placePieces(int x, int y)
+{
+	string ret = "";
+
+	Position pos;
+	pos.x = 0;
+	pos.y = 0;
+	pos.rotation = 0;
+	ret += game_board->setPiece(Carrier, pos) + ",";
+
+	pos.x = 2;
+	pos.y = 9;
+	pos.rotation = 1;
+	ret += game_board->setPiece(Battleship, pos) + ",";
+
+	pos.x = 9;
+	pos.y = 3;
+	pos.rotation = 3;
+	ret += game_board->setPiece(Submarine, pos) + ",";
+
+	pos.x = 4;
+	pos.y = 9;
+	pos.rotation = 1;
+	ret += game_board->setPiece(Destroyer, pos) + ",";
+
+	pos.x = 6;
+	pos.y = 2;
+	pos.rotation = 2;
+	ret += game_board->setPiece(Cruiser, pos);
+
+	return ret;
 }
 
 
